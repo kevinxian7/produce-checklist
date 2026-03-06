@@ -1,1 +1,9 @@
 
+{
+  "name": "Produce Rotation Checklist",
+  "short_name": "Produce List",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0b0f16",
+  "theme_color": "#0b0f16"
+}
