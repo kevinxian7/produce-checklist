@@ -1,1 +1,678 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Produce Rotation Checklist</title>
+  <style>
+    :root{
+      --bg: #0b0f16;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.08);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --line: rgba(255,255,255,.12);
+      --accent: #7cf7c5;
+      --accent2:#7aa7ff;
+      --danger:#ff6b6b;
+      --shadow: 0 18px 55px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius2: 14px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
 
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(1100px 600px at 15% -10%, rgba(122,167,255,.22), transparent 60%),
+        radial-gradient(1100px 600px at 90% 0%, rgba(124,247,197,.18), transparent 55%),
+        radial-gradient(900px 500px at 50% 120%, rgba(255,255,255,.08), transparent 55%),
+        var(--bg);
+      min-height:100vh;
+      padding: 28px 18px 50px;
+    }
+
+    .wrap{
+      max-width: 1100px;
+      margin: 0 auto;
+      display:flex;
+      flex-direction:column;
+      gap: 18px;
+    }
+
+    header{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .title{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    h1{
+      font-size: clamp(20px, 2.2vw, 28px);
+      letter-spacing: -.02em;
+      margin:0;
+      line-height:1.1;
+    }
+    .sub{
+      color: var(--muted);
+      margin:0;
+      max-width: 65ch;
+      font-size: 14px;
+      line-height:1.4;
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .pill{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .pill b{ color: var(--text); font-weight: 650; }
+
+    .btn{
+      cursor:pointer;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 650;
+      transition: transform .06s ease, background .18s ease, border-color .18s ease;
+      user-select:none;
+    }
+    .btn:hover{
+      background: rgba(255,255,255,.10);
+      border-color: rgba(255,255,255,.18);
+    }
+    .btn:active{ transform: translateY(1px); }
+    .btn.danger{
+      border-color: rgba(255,107,107,.35);
+      background: rgba(255,107,107,.12);
+    }
+    .btn.danger:hover{
+      background: rgba(255,107,107,.18);
+      border-color: rgba(255,107,107,.55);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    @media(min-width: 920px){
+      .grid{
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .cardHead{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom: 12px;
+      flex-wrap:wrap;
+    }
+
+    .cardTitle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      font-size: 16px;
+      margin:0;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(124,247,197,.10);
+      flex: 0 0 auto;
+    }
+    .dot.blue{
+      background: var(--accent2);
+      box-shadow: 0 0 0 4px rgba(122,167,255,.10);
+    }
+
+    .metaRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .search{
+      width: 100%;
+      display:flex;
+      gap:10px;
+      margin-bottom: 12px;
+    }
+    .search input{
+      width: 100%;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: var(--text);
+      outline:none;
+      font-size: 13px;
+    }
+    .search input::placeholder{ color: rgba(255,255,255,.55); }
+
+    .list{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      max-height: 520px;
+      overflow:auto;
+      padding-right: 4px;
+    }
+    .list::-webkit-scrollbar{ width: 10px; }
+    .list::-webkit-scrollbar-thumb{
+      background: rgba(255,255,255,.12);
+      border-radius: 99px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.12);
+      transition: background .16s ease, border-color .16s ease;
+    }
+    .row:hover{
+      background: rgba(0,0,0,.18);
+      border-color: rgba(255,255,255,.16);
+    }
+
+    label{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      width:100%;
+      user-select:none;
+      min-width: 0;
+    }
+    input[type="checkbox"]{
+      width: 18px; height: 18px;
+      accent-color: var(--accent);
+      cursor:pointer;
+      flex: 0 0 auto;
+    }
+    .fruit input[type="checkbox"]{
+      accent-color: var(--accent2);
+    }
+
+    .name{
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: -.01em;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .badge{
+      font-family: var(--mono);
+      font-size: 11px;
+      color: rgba(255,255,255,.70);
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      flex: 0 0 auto;
+    }
+    .checked .name{
+      color: rgba(255,255,255,.72);
+      text-decoration: line-through;
+      text-decoration-thickness: 1px;
+    }
+
+    .hint{
+      margin-top: 12px;
+      color: rgba(255,255,255,.68);
+      font-size: 12px;
+      line-height:1.35;
+      border-top: 1px dashed rgba(255,255,255,.16);
+      padding-top: 12px;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.55);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .22s ease, transform .22s ease;
+    }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <h1>Produce Rotation Checklist</h1>
+        <p class="sub">
+          Check items as you eat them. The list auto-prioritizes what you <b>haven’t</b> eaten yet.
+          When you’ve eaten “most” of a list, it automatically unchecks your <b>oldest</b> checks so you cycle forever.
+        </p>
+      </div>
+
+      <div class="controls" id="globalControls">
+        <div class="pill" title="How the rotation works">
+          Rotation threshold: <b id="thresholdLabel">80%</b>
+        </div>
+        <button class="btn" id="shuffleBtn" title="Randomize the order within each category (keeps rotation logic)">Shuffle</button>
+        <button class="btn danger" id="resetBtn" title="Clear all checks and history">Reset All</button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="card" id="vegCard">
+        <div class="cardHead">
+          <h2 class="cardTitle"><span class="dot"></span> Vegetables</h2>
+          <div class="metaRow">
+            <div class="pill">Eaten: <b id="vegCount">0</b>/<span id="vegTotal">0</span></div>
+            <button class="btn" id="vegReset">Reset Vegetables</button>
+          </div>
+        </div>
+        <div class="search">
+          <input id="vegSearch" placeholder="Search vegetables…" />
+        </div>
+        <div class="list" id="vegList" aria-label="Vegetables checklist"></div>
+        <div class="hint">
+          Tip: The “badge” shows how long ago it was checked (relative order). Oldest gets cleared first when rotation triggers.
+        </div>
+      </div>
+
+      <div class="card" id="fruitCard">
+        <div class="cardHead">
+          <h2 class="cardTitle"><span class="dot blue"></span> Fruits</h2>
+          <div class="metaRow">
+            <div class="pill">Eaten: <b id="fruitCount">0</b>/<span id="fruitTotal">0</span></div>
+            <button class="btn" id="fruitReset">Reset Fruits</button>
+          </div>
+        </div>
+        <div class="search">
+          <input id="fruitSearch" placeholder="Search fruits…" />
+        </div>
+        <div class="list" id="fruitList" aria-label="Fruits checklist"></div>
+        <div class="hint">
+          Rotation rule: once you hit the threshold, the app automatically unchecks the oldest items so everything cycles.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+/**
+ * Produce Rotation Checklist
+ * - Two lists with independent rotation.
+ * - Keeps a "checked order" queue so we can uncheck the oldest items when nearing completion.
+ * - Sorting: unchecked first; checked later; within each group preserve "seed order" (optionally shuffled).
+ * - Persistence via localStorage.
+ */
+
+const DEFAULT_THRESHOLD = 0.80; // 80% eaten triggers rotation
+const STORAGE_KEY = "produce_rotation_v1";
+
+// 30 vegetables and 30 fruits (from your earlier list)
+const VEGETABLES = [
+  "Potato","Tomato","Onion","Garlic","Carrot","Broccoli","Spinach","Cabbage","Bell Pepper","Lettuce",
+  "Cucumber","Eggplant","Cauliflower","Zucchini","Green Beans","Peas","Asparagus","Sweet Potato","Kale","Brussels Sprouts",
+  "Corn","Celery","Mushrooms","Radish","Beet","Turnip","Leek","Artichoke","Okra","Bok Choy"
+];
+
+const FRUITS = [
+  "Apple","Banana","Orange","Strawberry","Mango","Pineapple","Watermelon","Blueberry","Grape","Peach",
+  "Pear","Cherry","Kiwi","Pomegranate","Papaya","Lemon","Lime","Coconut","Avocado","Raspberry",
+  "Blackberry","Plum","Apricot","Cantaloupe","Fig","Guava","Passion Fruit","Dragon Fruit","Persimmon","Lychee"
+];
+
+// ---------- State ----------
+let state = loadState() ?? makeFreshState();
+
+function makeFreshState(){
+  return {
+    threshold: DEFAULT_THRESHOLD,
+    veg: makeListState(VEGETABLES),
+    fruit: makeListState(FRUITS),
+  };
+}
+
+function makeListState(items){
+  // seedOrder: controls display order inside groups (unchecked/checked). Can be shuffled.
+  const seedOrder = items.map((name, i) => ({ name, seed: i }));
+  return {
+    seedOrder,
+    checked: {},          // name -> true/false
+    checkedQueue: [],     // array of names in the order they were checked (oldest first)
+    lastActionId: 0       // increments for badge labels
+  };
+}
+
+// ---------- Persistence ----------
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+
+    // Basic migration / validation
+    if(!parsed || !parsed.veg || !parsed.fruit) return null;
+
+    // Ensure all items exist (in case you edit lists later)
+    parsed.veg = normalizeListState(parsed.veg, VEGETABLES);
+    parsed.fruit = normalizeListState(parsed.fruit, FRUITS);
+
+    parsed.threshold = typeof parsed.threshold === "number" ? parsed.threshold : DEFAULT_THRESHOLD;
+    return parsed;
+  }catch(e){
+    return null;
+  }
+}
+
+function normalizeListState(ls, items){
+  const itemSet = new Set(items);
+  const safeSeed = Array.isArray(ls.seedOrder) ? ls.seedOrder : items.map((n,i)=>({name:n,seed:i}));
+
+  // rebuild seedOrder to match items, preserve any existing seed values where possible
+  const seedMap = new Map(safeSeed.map(x => [x.name, x.seed]));
+  const seedOrder = items.map((name, idx) => ({ name, seed: seedMap.has(name) ? seedMap.get(name) : idx }));
+
+  const checked = (ls.checked && typeof ls.checked === "object") ? ls.checked : {};
+  const cleanChecked = {};
+  for(const name of items){
+    cleanChecked[name] = !!checked[name];
+  }
+
+  const queue = Array.isArray(ls.checkedQueue) ? ls.checkedQueue.filter(n => itemSet.has(n)) : [];
+  // also ensure queue doesn't contain unchecked names
+  const filteredQueue = queue.filter(n => cleanChecked[n]);
+
+  return {
+    seedOrder,
+    checked: cleanChecked,
+    checkedQueue: filteredQueue,
+    lastActionId: typeof ls.lastActionId === "number" ? ls.lastActionId : 0
+  };
+}
+
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ---------- Utilities ----------
+function toast(msg){
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=> el.classList.remove("show"), 1500);
+}
+
+function shuffleArray(arr){
+  for(let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function checkedCount(ls){
+  return Object.values(ls.checked).filter(Boolean).length;
+}
+
+function rotationThresholdCount(ls){
+  return Math.ceil(ls.seedOrder.length * state.threshold);
+}
+
+function applyRotationIfNeeded(ls, label){
+  const count = checkedCount(ls);
+  const thresholdCount = rotationThresholdCount(ls);
+  if(count < thresholdCount) return;
+
+  // Uncheck oldest until we're comfortably below the threshold.
+  // Target: drop down to ~60% so user can progress again without immediate re-rotation.
+  const target = Math.floor(ls.seedOrder.length * 0.60);
+  let removed = 0;
+
+  while(checkedCount(ls) > target && ls.checkedQueue.length){
+    const oldest = ls.checkedQueue.shift();
+    if(ls.checked[oldest]){
+      ls.checked[oldest] = false;
+      removed++;
+    }
+  }
+
+  if(removed > 0){
+    toast(`${label}: rotated — cleared ${removed} oldest item${removed===1?"":"s"}.`);
+  }
+}
+
+function sortForDisplay(ls, query){
+  const q = (query ?? "").trim().toLowerCase();
+
+  const items = ls.seedOrder
+    .map(x => ({
+      name: x.name,
+      seed: x.seed,
+      checked: !!ls.checked[x.name]
+    }))
+    .filter(x => !q || x.name.toLowerCase().includes(q));
+
+  // Unchecked first; then checked. Within groups sort by seed.
+  items.sort((a,b)=>{
+    if(a.checked !== b.checked) return a.checked ? 1 : -1;
+    return a.seed - b.seed;
+  });
+
+  return items;
+}
+
+function badgeFor(ls, name){
+  // Show "age" based on position in queue (1=oldest)
+  const idx = ls.checkedQueue.indexOf(name);
+  if(idx === -1) return "—";
+  return `#${idx+1}`;
+}
+
+// ---------- Rendering ----------
+const vegListEl = document.getElementById("vegList");
+const fruitListEl = document.getElementById("fruitList");
+const vegSearchEl = document.getElementById("vegSearch");
+const fruitSearchEl = document.getElementById("fruitSearch");
+
+document.getElementById("vegTotal").textContent = VEGETABLES.length;
+document.getElementById("fruitTotal").textContent = FRUITS.length;
+
+function updateCounters(){
+  document.getElementById("vegCount").textContent = checkedCount(state.veg);
+  document.getElementById("fruitCount").textContent = checkedCount(state.fruit);
+  document.getElementById("thresholdLabel").textContent = `${Math.round(state.threshold*100)}%`;
+}
+
+function renderList(ls, el, kind, query){
+  el.innerHTML = "";
+  const items = sortForDisplay(ls, query);
+
+  for(const item of items){
+    const row = document.createElement("div");
+    row.className = "row" + (item.checked ? " checked" : "") + (kind === "fruit" ? " fruit" : "");
+    const id = `${kind}-${item.name.replace(/\s+/g,"-").toLowerCase()}`;
+
+    const label = document.createElement("label");
+    label.setAttribute("for", id);
+
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.id = id;
+    cb.checked = item.checked;
+
+    cb.addEventListener("change", () => {
+      setChecked(ls, item.name, cb.checked, kind === "veg" ? "Vegetables" : "Fruits");
+      saveState();
+      updateCounters();
+      renderAll();
+    });
+
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = item.name;
+
+    const badge = document.createElement("div");
+    badge.className = "badge";
+    badge.title = "Checked order (oldest first)";
+    badge.textContent = item.checked ? badgeFor(ls, item.name) : "—";
+
+    label.appendChild(cb);
+    label.appendChild(name);
+
+    row.appendChild(label);
+    row.appendChild(badge);
+    el.appendChild(row);
+  }
+}
+
+function renderAll(){
+  renderList(state.veg, vegListEl, "veg", vegSearchEl.value);
+  renderList(state.fruit, fruitListEl, "fruit", fruitSearchEl.value);
+}
+
+// ---------- Actions ----------
+function setChecked(ls, name, isChecked, label){
+  const currently = !!ls.checked[name];
+  if(currently === isChecked) return;
+
+  ls.checked[name] = isChecked;
+
+  if(isChecked){
+    // push to end of queue (newest)
+    // remove if it exists already to prevent duplicates
+    ls.checkedQueue = ls.checkedQueue.filter(n => n !== name);
+    ls.checkedQueue.push(name);
+    toast(`${label}: checked ${name}`);
+  }else{
+    // remove from queue
+    ls.checkedQueue = ls.checkedQueue.filter(n => n !== name);
+    toast(`${label}: unchecked ${name}`);
+  }
+
+  applyRotationIfNeeded(ls, label);
+}
+
+function resetList(ls, label){
+  for(const k of Object.keys(ls.checked)){
+    ls.checked[k] = false;
+  }
+  ls.checkedQueue = [];
+  toast(`${label}: reset.`);
+}
+
+function resetAll(){
+  state = makeFreshState();
+  saveState();
+  updateCounters();
+  renderAll();
+  toast("Reset everything.");
+}
+
+function shuffleAll(){
+  shuffleArray(state.veg.seedOrder);
+  shuffleArray(state.fruit.seedOrder);
+
+  // Reassign seeds to reflect new order (so sort is stable)
+  state.veg.seedOrder.forEach((x,i)=> x.seed = i);
+  state.fruit.seedOrder.forEach((x,i)=> x.seed = i);
+
+  saveState();
+  renderAll();
+  toast("Shuffled both lists.");
+}
+
+// ---------- Wire up UI ----------
+vegSearchEl.addEventListener("input", () => renderAll());
+fruitSearchEl.addEventListener("input", () => renderAll());
+
+document.getElementById("vegReset").addEventListener("click", () => {
+  resetList(state.veg, "Vegetables");
+  saveState(); updateCounters(); renderAll();
+});
+document.getElementById("fruitReset").addEventListener("click", () => {
+  resetList(state.fruit, "Fruits");
+  saveState(); updateCounters(); renderAll();
+});
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  if(confirm("Reset ALL fruits + vegetables and clear history?")){
+    localStorage.removeItem(STORAGE_KEY);
+    resetAll();
+  }
+});
+
+document.getElementById("shuffleBtn").addEventListener("click", () => shuffleAll());
+
+// Initial render
+updateCounters();
+renderAll();
+saveState();
+</script>
+</body>
+</html>
